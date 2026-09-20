@@ -28,15 +28,18 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            minsa: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              500: '#0284c7',
-              700: '#0369a1',
-              900: '#0c4a6e',
+            dashboard: {
+              bg: '#0b1726',       /* Fondo general oscuro */
+              panel: '#112236',    /* Fondo de contenedores principales */
+              card: '#182d44',     /* Fondo de tarjetas / KPIs */
+              border: '#233e5b',   /* Bordes y divisiones */
+              hover: '#1e3854',    /* Hover en elementos */
             },
-            excelHeader: '#b4c6e7',
-            excelSubheader: '#d9e1f2'
+            amberAccent: {
+              400: '#fbbf24',
+              500: '#f59e0b',     /* Naranja/Dorado principal de la imagen */
+              600: '#d97706',
+            }
           }
         }
       }
@@ -44,21 +47,20 @@
   </script>
 
   <style>
-    /* Custom Scrollbars for Pivot Table */
+    /* Custom Scrollbars for Pivot Table Dark */
     .pivot-scroll::-webkit-scrollbar {
-      height: 10px;
-      width: 10px;
+      height: 8px;
+      width: 8px;
     }
     .pivot-scroll::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 4px;
+      background: #0b1726;
     }
     .pivot-scroll::-webkit-scrollbar-thumb {
-      background: #94a3b8;
+      background: #233e5b;
       border-radius: 4px;
     }
     .pivot-scroll::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+      background: #335377;
     }
 
     /* Vertical/Angled Header Text for Excel Pivot Days */
@@ -80,46 +82,40 @@
       background-color: inherit;
     }
 
-    .sticky-header-top {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-    }
-
-    /* Matrix grid borders similar to Excel */
+    /* Matrix grid borders */
     .excel-cell {
-      border: 1px solid #cbd5e1;
+      border: 1px solid #233e5b;
     }
   </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen">
+<body class="bg-dashboard-bg font-sans text-slate-200 antialiased min-h-screen">
 
   <!-- Top Navigation Header -->
-  <header class="bg-minsa-900 text-white shadow-md border-b-4 border-minsa-500">
+  <header class="bg-dashboard-panel border-b border-dashboard-border shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
       <div class="flex items-center space-x-3">
-        <div class="p-2.5 bg-minsa-700 rounded-lg text-white shadow-sm">
+        <div class="p-2.5 bg-dashboard-card border border-dashboard-border rounded-lg text-amberAccent-500 shadow-sm">
           <i class="fa-solid me-1 fa-user-doctor text-2xl"></i>
           <i class="fa-solid fa-hospital-user text-xl"></i>
         </div>
         <div>
           <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            PRODUCIÓN DEL PERSONAL DE SALUD - MICRORED COLCABAMBA
-            <span class="text-xs bg-sky-500/30 text-sky-200 border border-sky-400/40 px-2 py-0.5 rounded-full font-normal">MINSA / DIRESA</span>
+            PRODUCCIÓN DEL PERSONAL DE SALUD - MICRORED COLCABAMBA
+            <span class="text-xs bg-amberAccent-500/20 text-amberAccent-400 border border-amberAccent-500/40 px-2 py-0.5 rounded-full font-normal">MINSA / DIRESA</span>
           </h1>
-          <p class="text-xs text-slate-300">
+          <p class="text-xs text-slate-400">
             Monitoreo Nominal y Matriz Pivot de Pacientes Atendidos vs Total Atenciones
-            <span class="ml-2 pl-2 border-l border-slate-500 text-sky-300 font-medium">Copywriting: Yelsin Galindo</span>
+            <span class="ml-2 pl-2 border-l border-dashboard-border text-amberAccent-400 font-medium">Copywriting: Yelsin Galindo</span>
           </p>
         </div>
       </div>
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center space-x-3">
-        <button id="btnExportExcel" onclick="exportPivotTableToExcel()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+        <button id="btnExportExcel" onclick="exportPivotTableToExcel()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-amberAccent-500 hover:bg-amberAccent-600 text-slate-950 font-bold text-xs rounded-lg shadow transition">
           <i class="fa-solid fa-file-excel text-sm"></i> Exportar Matriz a Excel
         </button>
-        <button onclick="loadInitialDemoData()" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg shadow transition" title="Recargar datos del repositorio">
+        <button onclick="loadInitialDemoData()" class="inline-flex items-center gap-2 px-3 py-2 bg-dashboard-card hover:bg-dashboard-hover border border-dashboard-border text-slate-300 text-xs font-medium rounded-lg shadow transition" title="Recargar datos del repositorio">
           <i class="fa-solid fa-rotate-left"></i> Recargar
         </button>
       </div>
@@ -132,40 +128,40 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
       
       <!-- Excel File Uploader (1/4) -->
-      <div class="lg:col-span-1 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+      <div class="lg:col-span-1 bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
-            <span><i class="fa-solid fa-file-arrow-up text-emerald-600 mr-1.5"></i> Cargar Archivo Excel</span>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-file-arrow-up text-amberAccent-500 mr-1.5"></i> Cargar Archivo Excel</span>
             <span class="text-[10px] text-slate-400 font-normal">.xlsx / .xls</span>
           </label>
           
-          <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-minsa-500 bg-slate-50 hover:bg-sky-50/50 rounded-lg p-3 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[90px]">
+          <div id="dropZone" class="border-2 border-dashed border-dashboard-border hover:border-amberAccent-500 bg-dashboard-card/50 hover:bg-dashboard-card rounded-lg p-3 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[90px]">
             <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelect(event)">
-            <i class="fa-solid fa-cloud-arrow-up text-2xl text-minsa-500 mb-1"></i>
-            <p class="text-xs text-slate-600 font-medium">Arrastra tu <span class="font-semibold text-minsa-700">PRODUCCION_SQL_DIA.xlsx</span></p>
+            <i class="fa-solid fa-cloud-arrow-up text-2xl text-amberAccent-500 mb-1"></i>
+            <p class="text-xs text-slate-300 font-medium">Arrastra tu <span class="font-semibold text-amberAccent-400">PRODUCCION_SQL_DIA.xlsx</span></p>
             <p class="text-[10px] text-slate-400 mt-0.5">o haz clic para examinar manual</p>
           </div>
         </div>
-        <div id="fileStatus" class="mt-2 text-[11px] text-slate-500 truncate flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Datos activos: <span id="fileNameDisplay" class="font-medium text-slate-700">Cargando Excel automático...</span>
+        <div id="fileStatus" class="mt-2 text-[11px] text-slate-400 truncate flex items-center gap-1.5 border-t border-dashboard-border pt-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Datos activos: <span id="fileNameDisplay" class="font-medium text-slate-200">Cargando Excel automático...</span>
         </div>
       </div>
 
       <!-- Interactive Filters (3/4) -->
-      <div class="lg:col-span-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center">
-            <i class="fa-solid fa-filter text-minsa-500 mr-2"></i> Filtros de Segmentación de Datos
+      <div class="lg:col-span-3 bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between space-y-3">
+        <div class="flex items-center justify-between border-b border-dashboard-border pb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center">
+            <i class="fa-solid fa-filter text-amberAccent-500 mr-2"></i> Filtros de Segmentación de Datos
           </span>
-          <span class="text-xs text-slate-500 font-medium" id="recordCountBadge">0 Registros procesados</span>
+          <span class="text-xs text-amberAccent-400 font-semibold bg-dashboard-card px-2.5 py-0.5 rounded-full border border-dashboard-border" id="recordCountBadge">0 Registros procesados</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <!-- Filter: EESS -->
           <div>
-            <label for="filterEess" class="block text-xs font-semibold text-slate-600 mb-1">ESTABLECIMIENTO DE SALUD</label>
+            <label for="filterEess" class="block text-xs font-semibold text-slate-400 mb-1">ESTABLECIMIENTO DE SALUD</label>
             <div class="relative">
-              <select id="filterEess" onchange="applyFiltersAndRender()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg focus:ring-minsa-500 focus:border-minsa-500 p-2 pr-8 appearance-none font-medium">
+              <select id="filterEess" onchange="applyFiltersAndRender()" class="w-full bg-dashboard-card border border-dashboard-border text-slate-100 text-xs rounded-lg focus:ring-amberAccent-500 focus:border-amberAccent-500 p-2 pr-8 appearance-none font-medium">
                 <option value="ALL">-- TODOS LOS ESTABLECIMIENTOS --</option>
               </select>
               <i class="fa-solid fa-chevron-down absolute right-2.5 top-2.5 text-xs text-slate-400 pointer-events-none"></i>
@@ -174,9 +170,9 @@
 
           <!-- Filter: Profession -->
           <div>
-            <label for="filterProfession" class="block text-xs font-semibold text-slate-600 mb-1">PROFESIÓN / ESPECIALIDAD</label>
+            <label for="filterProfession" class="block text-xs font-semibold text-slate-400 mb-1">PROFESIÓN / ESPECIALIDAD</label>
             <div class="relative">
-              <select id="filterProfession" onchange="applyFiltersAndRender()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg focus:ring-minsa-500 focus:border-minsa-500 p-2 pr-8 appearance-none font-medium">
+              <select id="filterProfession" onchange="applyFiltersAndRender()" class="w-full bg-dashboard-card border border-dashboard-border text-slate-100 text-xs rounded-lg focus:ring-amberAccent-500 focus:border-amberAccent-500 p-2 pr-8 appearance-none font-medium">
                 <option value="ALL">-- TODAS LAS PROFESIONES --</option>
               </select>
               <i class="fa-solid fa-chevron-down absolute right-2.5 top-2.5 text-xs text-slate-400 pointer-events-none"></i>
@@ -185,21 +181,21 @@
 
           <!-- Filter: Staff Search -->
           <div>
-            <label for="searchStaff" class="block text-xs font-semibold text-slate-600 mb-1">BUSCAR PERSONAL DE SALUD</label>
+            <label for="searchStaff" class="block text-xs font-semibold text-slate-400 mb-1">BUSCAR PERSONAL DE SALUD</label>
             <div class="relative">
-              <input type="text" id="searchStaff" oninput="applyFiltersAndRender()" placeholder="Nombre del profesional..." class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg focus:ring-minsa-500 focus:border-minsa-500 p-2 pl-8 font-medium">
+              <input type="text" id="searchStaff" oninput="applyFiltersAndRender()" placeholder="Nombre del profesional..." class="w-full bg-dashboard-card border border-dashboard-border text-slate-100 text-xs rounded-lg focus:ring-amberAccent-500 focus:border-amberAccent-500 p-2 pl-8 font-medium">
               <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-400"></i>
             </div>
           </div>
         </div>
 
         <!-- Excel-Like Month & Year Timeline Filter -->
-        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="bg-dashboard-card p-2 rounded-lg border border-dashboard-border flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center space-x-2">
-            <span class="text-[11px] font-bold text-slate-600 uppercase flex items-center">
-              <i class="fa-solid fa-calendar-days text-minsa-500 mr-1.5"></i> FECHA_ATENCION:
+            <span class="text-[11px] font-bold text-slate-300 uppercase flex items-center">
+              <i class="fa-solid fa-calendar-days text-amberAccent-500 mr-1.5"></i> FECHA_ATENCION:
             </span>
-            <select id="filterYear" onchange="applyFiltersAndRender()" class="bg-white border border-slate-300 text-xs rounded px-2 py-0.5 font-bold text-minsa-900">
+            <select id="filterYear" onchange="applyFiltersAndRender()" class="bg-dashboard-panel border border-dashboard-border text-xs rounded px-2 py-0.5 font-bold text-amberAccent-400">
               <!-- Dynamically populated -->
             </select>
           </div>
@@ -215,77 +211,77 @@
 
     <!-- Key Metrics Cards (KPIs) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-3">
-        <div class="p-3 bg-blue-50 text-minsa-500 rounded-lg">
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex items-center space-x-3">
+        <div class="p-3 bg-dashboard-card text-amberAccent-500 rounded-lg border border-dashboard-border">
           <i class="fa-solid fa-hospital-user text-xl"></i>
         </div>
         <div>
-          <p class="text-xs font-medium text-slate-500">Pacientes Atendidos</p>
-          <h3 id="kpiPacientes" class="text-2xl font-bold text-slate-800">0</h3>
-          <p class="text-[10px] text-slate-400">Personas únicas / día</p>
+          <p class="text-xs font-medium text-slate-400">Pacientes Atendidos</p>
+          <h3 id="kpiPacientes" class="text-2xl font-bold text-amberAccent-400">0</h3>
+          <p class="text-[10px] text-slate-500">Personas únicas / día</p>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-3">
-        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex items-center space-x-3">
+        <div class="p-3 bg-dashboard-card text-emerald-400 rounded-lg border border-dashboard-border">
           <i class="fa-solid fa-clipboard-check text-xl"></i>
         </div>
         <div>
-          <p class="text-xs font-medium text-slate-500">Total de Atenciones</p>
-          <h3 id="kpiAtenciones" class="text-2xl font-bold text-slate-800">0</h3>
-          <p class="text-[10px] text-slate-400">Procedimientos/consultas</p>
+          <p class="text-xs font-medium text-slate-400">Total de Atenciones</p>
+          <h3 id="kpiAtenciones" class="text-2xl font-bold text-white">0</h3>
+          <p class="text-[10px] text-slate-500">Procedimientos/consultas</p>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-3">
-        <div class="p-3 bg-purple-50 text-purple-600 rounded-lg">
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex items-center space-x-3">
+        <div class="p-3 bg-dashboard-card text-sky-400 rounded-lg border border-dashboard-border">
           <i class="fa-solid fa-user-nurse text-xl"></i>
         </div>
         <div>
-          <p class="text-xs font-medium text-slate-500">Personal Activo</p>
-          <h3 id="kpiPersonal" class="text-2xl font-bold text-slate-800">0</h3>
-          <p class="text-[10px] text-slate-400">Profesionales con registro</p>
+          <p class="text-xs font-medium text-slate-400">Personal Activo</p>
+          <h3 id="kpiPersonal" class="text-2xl font-bold text-white">0</h3>
+          <p class="text-[10px] text-slate-500">Profesionales con registro</p>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-3">
-        <div class="p-3 bg-amber-50 text-amber-600 rounded-lg">
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex items-center space-x-3">
+        <div class="p-3 bg-dashboard-card text-amberAccent-500 rounded-lg border border-dashboard-border">
           <i class="fa-solid fa-chart-line text-xl"></i>
         </div>
         <div>
-          <p class="text-xs font-medium text-slate-500">Promedio Diario/Prof.</p>
-          <h3 id="kpiPromedio" class="text-2xl font-bold text-slate-800">0</h3>
-          <p class="text-[10px] text-slate-400">Atenciones por día activo</p>
+          <p class="text-xs font-medium text-slate-400">Promedio Diario/Prof.</p>
+          <h3 id="kpiPromedio" class="text-2xl font-bold text-amberAccent-400">0</h3>
+          <p class="text-[10px] text-slate-500">Atenciones por día activo</p>
         </div>
       </div>
     </div>
 
     <!-- MAIN PIVOT MATRIX TABLE SECTION -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+    <div class="bg-dashboard-panel rounded-xl shadow-sm border border-dashboard-border overflow-hidden">
       
       <!-- Pivot Header Toolbar -->
-      <div class="bg-slate-200/80 p-3 border-b border-slate-300 flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-dashboard-card p-3 border-b border-dashboard-border flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center space-x-3">
-          <span class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-table-cells text-minsa-700 text-sm"></i> Matriz de Producción Diario (Pivot Table)
+          <span class="text-xs font-bold text-slate-200 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-table-cells text-amberAccent-500 text-sm"></i> Matriz de Producción Diario (Pivot Table)
           </span>
 
           <!-- Metric Switcher Dropdown -->
-          <div class="flex items-center bg-white border border-slate-300 rounded-md px-2 py-1 shadow-sm">
-            <label for="pivotMetricSelect" class="text-xs font-semibold text-slate-600 mr-2">Métrica:</label>
-            <select id="pivotMetricSelect" onchange="renderPivotMatrix()" class="text-xs font-bold text-minsa-900 bg-transparent focus:outline-none cursor-pointer">
-              <option value="PACIENTES_ATENDIDOS_DIA">Suma de PACIENTES_ATENDIDOS_DIA</option>
-              <option value="TOTAL_ATENCIONES_DIA">Suma de TOTAL_ATENCIONES_DIA</option>
+          <div class="flex items-center bg-dashboard-panel border border-dashboard-border rounded-md px-2 py-1 shadow-sm">
+            <label for="pivotMetricSelect" class="text-xs font-semibold text-slate-400 mr-2">Métrica:</label>
+            <select id="pivotMetricSelect" onchange="renderPivotMatrix()" class="text-xs font-bold text-amberAccent-400 bg-transparent focus:outline-none cursor-pointer">
+              <option value="PACIENTES_ATENDIDOS_DIA" class="bg-dashboard-panel text-slate-200">Suma de PACIENTES_ATENDIDOS_DIA</option>
+              <option value="TOTAL_ATENCIONES_DIA" class="bg-dashboard-panel text-slate-200">Suma de TOTAL_ATENCIONES_DIA</option>
             </select>
           </div>
         </div>
 
         <div class="flex items-center space-x-2 text-xs">
-          <span class="text-slate-600">Establecimiento:</span>
-          <span id="currentEessBadge" class="bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded border border-sky-300">
+          <span class="text-slate-400">Establecimiento:</span>
+          <span id="currentEessBadge" class="bg-dashboard-panel text-amberAccent-400 font-bold px-2 py-0.5 rounded border border-dashboard-border">
             MICRORED COLCABAMBA
           </span>
-          <button onclick="toggleExpandAllGroups()" id="btnToggleExpand" class="ml-2 px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded text-[11px] font-semibold text-slate-700 shadow-sm transition">
+          <button onclick="toggleExpandAllGroups()" id="btnToggleExpand" class="ml-2 px-2.5 py-1 bg-dashboard-panel hover:bg-dashboard-hover border border-dashboard-border rounded text-[11px] font-semibold text-slate-200 shadow-sm transition">
             <i class="fa-solid fa-folder-minus mr-1"></i> Plegar/Desplegar Todo
           </button>
         </div>
@@ -295,14 +291,14 @@
       <div class="overflow-x-auto pivot-scroll max-h-[600px] overflow-y-auto relative">
         <table id="pivotMatrixTable" class="w-full border-collapse text-xs select-none">
           <thead>
-            <tr id="pivotHeaderRow" class="bg-excelHeader text-slate-800 font-bold">
+            <tr id="pivotHeaderRow" class="bg-dashboard-card text-amberAccent-400 font-bold border-b border-dashboard-border">
               <!-- Dynamically rendered -->
             </tr>
-            <tr id="pivotSubheaderRow" class="bg-excelSubheader font-bold text-slate-900 border-b-2 border-slate-400">
+            <tr id="pivotSubheaderRow" class="bg-dashboard-panel font-bold text-slate-200 border-b border-dashboard-border">
               <!-- Dynamically rendered -->
             </tr>
           </thead>
-          <tbody id="pivotBody" class="divide-y divide-slate-200">
+          <tbody id="pivotBody" class="divide-y divide-dashboard-border">
             <!-- Dynamically populated with Group Headers & Personnel rows -->
           </tbody>
           <tfoot id="pivotFooter">
@@ -312,13 +308,13 @@
       </div>
 
       <!-- Table Footer Status -->
-      <div class="p-2 bg-slate-100 border-t border-slate-300 text-[11px] text-slate-500 flex justify-between items-center px-4">
+      <div class="p-2 bg-dashboard-card border-t border-dashboard-border text-[11px] text-slate-400 flex justify-between items-center px-4">
         <div>
-          <span class="font-medium text-slate-700">* Nota:</span> Los valores representan la producción agregada por profesional según la métrica seleccionada.
+          <span class="font-medium text-slate-300">* Nota:</span> Los valores representan la producción agregada por profesional según la métrica seleccionada.
         </div>
         <div class="flex items-center space-x-3">
-          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-excelSubheader border border-slate-400 rounded-sm"></span> Subtotales Profesión</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-100 border border-blue-300 rounded-sm"></span> Total General</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-dashboard-panel border border-dashboard-border rounded-sm"></span> Subtotales Profesión</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amberAccent-500/30 border border-amberAccent-500 rounded-sm"></span> Total General</span>
         </div>
       </div>
     </div>
@@ -327,10 +323,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       
       <!-- Chart 1: Daily Evolution Line / Bar Chart -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center">
-            <i class="fa-solid fa-chart-line text-minsa-500 mr-2"></i> Evolución Diaria de Producción del Mes
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3 border-b border-dashboard-border pb-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center">
+            <i class="fa-solid fa-chart-line text-amberAccent-500 mr-2"></i> Evolución Diaria de Producción del Mes
           </h4>
           <span class="text-[11px] text-slate-400 font-medium">Comparativo diario</span>
         </div>
@@ -340,10 +336,10 @@
       </div>
 
       <!-- Chart 2: Production by Profession (Doughnut Chart) -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center">
-            <i class="fa-solid fa-chart-pie text-purple-500 mr-2"></i> Distribución de Atenciones por Profesión
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3 border-b border-dashboard-border pb-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center">
+            <i class="fa-solid fa-chart-pie text-amberAccent-500 mr-2"></i> Distribución de Atenciones por Profesión
           </h4>
           <span class="text-[11px] text-slate-400 font-medium">% del total</span>
         </div>
@@ -353,10 +349,10 @@
       </div>
 
       <!-- Chart 3: Horizontal Bar Chart - Top Production by Personnel -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center">
-            <i class="fa-solid fa-ranking-star text-amber-500 mr-2"></i> Top Personal con Mayor Producción
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3 border-b border-dashboard-border pb-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center">
+            <i class="fa-solid fa-ranking-star text-amberAccent-500 mr-2"></i> Top Personal con Mayor Producción
           </h4>
           <span class="text-[11px] text-slate-400 font-medium">Top 10 profesionales</span>
         </div>
@@ -366,10 +362,10 @@
       </div>
 
       <!-- Chart 4: Patients vs Total Attentions Comparison -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center">
-            <i class="fa-solid fa-code-compare text-emerald-500 mr-2"></i> Pacientes Atendidos vs Total Atenciones por EESS
+      <div class="bg-dashboard-panel p-4 rounded-xl shadow-sm border border-dashboard-border flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3 border-b border-dashboard-border pb-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center">
+            <i class="fa-solid fa-code-compare text-amberAccent-500 mr-2"></i> Pacientes Atendidos vs Total Atenciones por EESS
           </h4>
           <span class="text-[11px] text-slate-400 font-medium">Relación de concentración</span>
         </div>
@@ -383,14 +379,18 @@
   </main>
 
   <!-- Footer Info -->
-  <footer class="bg-white border-t border-slate-200 mt-10 py-4 text-center text-xs text-slate-500">
+  <footer class="bg-dashboard-panel border-t border-dashboard-border mt-10 py-4 text-center text-xs text-slate-400">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
       <p>© 2026 Tablero de Gestión de Producción del Personal de Salud - Microred Colcabamba. MINSA / DIRESA.</p>
-      <p class="text-[11px] text-slate-600 font-semibold">Copywriting: Yelsin Galindo</p>
+      <p class="text-[11px] text-amberAccent-400 font-semibold">Copywriting: Yelsin Galindo</p>
     </div>
   </footer>
 
   <script>
+    // Configuración global de colores para Chart.js
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#233e5b';
+
     // ==========================================
     // GLOBAL STATE & DATA STORAGE
     // ==========================================
@@ -401,7 +401,7 @@
     let selectedEess = "ALL";
     let selectedProfession = "ALL";
     let selectedYear = "2026";
-    let selectedMonth = ""; // Se auto-detectará según los datos del Excel
+    let selectedMonth = ""; 
     let searchQuery = "";
     
     // Grouping collapse state for Profession headers
@@ -411,7 +411,7 @@
     // Charts instances
     let chartDaily, chartPie, chartTop, chartCompare;
 
-    // Month mappings (Soporta múltiples formatos de texto)
+    // Month mappings
     const MONTH_NAMES = [
       { id: "Ene", num: 1, label: "ENE", aliases: ["ENE", "ENERO", "JAN", "JANUARY", "1", "01"] },
       { id: "Feb", num: 2, label: "FEB", aliases: ["FEB", "FEBRERO", "FEBRUARY", "2", "02"] },
@@ -533,7 +533,6 @@
 
       rawHealthData = parsedData;
 
-      // Auto-seleccionar el primer mes con registros si el actual está vacío
       const detectedMonths = Array.from(new Set(rawHealthData.map(d => d.month)));
       if (detectedMonths.length > 0 && !detectedMonths.includes(selectedMonth)) {
         selectedMonth = detectedMonths[0];
@@ -551,17 +550,17 @@
       
       dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.classList.add('border-minsa-500', 'bg-sky-100/50');
+        dropZone.classList.add('border-amberAccent-500', 'bg-dashboard-card');
       });
 
       dropZone.addEventListener('dragleave', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('border-minsa-500', 'bg-sky-100/50');
+        dropZone.classList.remove('border-amberAccent-500', 'bg-dashboard-card');
       });
 
       dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('border-minsa-500', 'bg-sky-100/50');
+        dropZone.classList.remove('border-amberAccent-500', 'bg-dashboard-card');
         if (e.dataTransfer.files.length > 0) {
           processExcelFile(e.dataTransfer.files[0]);
         }
@@ -649,7 +648,6 @@
       const container = document.getElementById('monthSelectorContainer');
       container.innerHTML = "";
 
-      // Obtener meses que realmente tienen datos
       const activeMonthsInDataset = new Set(rawHealthData.map(d => d.month));
 
       MONTH_NAMES.forEach(m => {
@@ -658,16 +656,16 @@
 
         let btnClass = "";
         if (isActive) {
-          btnClass = "bg-minsa-700 text-white font-bold shadow-sm ring-2 ring-sky-300";
+          btnClass = "bg-amberAccent-500 text-slate-950 font-extrabold shadow-sm ring-2 ring-amberAccent-400";
         } else if (hasData) {
-          btnClass = "bg-white text-slate-800 hover:bg-slate-200 font-bold border border-slate-300";
+          btnClass = "bg-dashboard-panel text-slate-200 hover:bg-dashboard-hover font-bold border border-dashboard-border";
         } else {
-          btnClass = "bg-slate-100 text-slate-400 font-normal border border-slate-200 opacity-60";
+          btnClass = "bg-dashboard-panel/50 text-slate-600 font-normal border border-dashboard-border/50 opacity-50";
         }
         
         const btn = document.createElement('button');
         btn.className = `px-2.5 py-1 rounded text-xs transition uppercase ${btnClass}`;
-        btn.innerHTML = `${m.label} ${hasData ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-0.5"></span>' : ''}`;
+        btn.innerHTML = `${m.label} ${hasData ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 ml-0.5"></span>' : ''}`;
         btn.onclick = () => {
           selectedMonth = m.id;
           renderMonthTimeline();
@@ -736,7 +734,7 @@
       const daysInMonth = getDaysInMonth(selectedMonth, parseInt(selectedYear));
 
       let headerHTML = `
-        <th rowspan="2" class="sticky-col-left bg-excelHeader border border-slate-400 p-2 text-left min-w-[240px] text-slate-900 font-bold z-30 shadow-r">
+        <th rowspan="2" class="sticky-col-left bg-dashboard-card border border-dashboard-border p-2 text-left min-w-[240px] text-amberAccent-400 font-bold z-30 shadow-r">
           Etiquetas de fila
         </th>
       `;
@@ -744,14 +742,14 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dayLabel = `${day}-${selectedMonth}`;
         headerHTML += `
-          <th class="excel-cell bg-excelHeader text-slate-800 text-center font-bold px-1 py-1 w-[32px] min-w-[32px]">
+          <th class="excel-cell bg-dashboard-card text-slate-300 text-center font-bold px-1 py-1 w-[32px] min-w-[32px]">
             <div class="vertical-header">${dayLabel}</div>
           </th>
         `;
       }
 
       headerHTML += `
-        <th rowspan="2" class="excel-cell bg-excelHeader text-slate-900 text-center font-extrabold px-3 py-2 min-w-[90px] border-l-2 border-slate-500">
+        <th rowspan="2" class="excel-cell bg-dashboard-card text-amberAccent-400 text-center font-extrabold px-3 py-2 min-w-[90px] border-l-2 border-dashboard-border">
           Total general
         </th>
       `;
@@ -803,8 +801,8 @@
       if (profKeys.length === 0) {
         pivotBody.innerHTML = `
           <tr>
-            <td colspan="${daysInMonth + 2}" class="p-8 text-center text-slate-400 font-medium">
-              <i class="fa-solid fa-folder-open text-2xl mb-2 block text-slate-300"></i>
+            <td colspan="${daysInMonth + 2}" class="p-8 text-center text-slate-500 font-medium">
+              <i class="fa-solid fa-folder-open text-2xl mb-2 block text-slate-600"></i>
               No hay datos disponibles para el mes seleccionado (${selectedMonth}).
             </td>
           </tr>
@@ -818,13 +816,13 @@
         const isCollapsed = collapsedProfessions[profKey] === true;
 
         bodyHTML += `
-          <tr class="bg-excelSubheader font-bold text-slate-900 hover:bg-sky-200 transition">
-            <td class="sticky-col-left bg-excelSubheader border border-slate-400 px-3 py-1.5 font-bold text-slate-900 flex items-center justify-between cursor-pointer" onclick="toggleProfessionGroup('${profKey}')">
+          <tr class="bg-dashboard-card font-bold text-slate-200 hover:bg-dashboard-hover transition">
+            <td class="sticky-col-left bg-dashboard-card border border-dashboard-border px-3 py-1.5 font-bold text-amberAccent-400 flex items-center justify-between cursor-pointer" onclick="toggleProfessionGroup('${profKey}')">
               <span class="flex items-center gap-1.5">
-                <i class="fa-solid ${isCollapsed ? 'fa-square-plus text-minsa-700' : 'fa-square-minus text-slate-600'} text-sm"></i>
+                <i class="fa-solid ${isCollapsed ? 'fa-square-plus text-amberAccent-500' : 'fa-square-minus text-slate-400'} text-sm"></i>
                 <span>${profKey}</span>
               </span>
-              <span class="text-[10px] font-normal text-slate-600 bg-white/60 px-1.5 py-0.2 rounded">
+              <span class="text-[10px] font-normal text-slate-400 bg-dashboard-panel px-1.5 py-0.2 rounded border border-dashboard-border">
                 ${Object.keys(profGroup.staffMap).length} pers.
               </span>
             </td>
@@ -833,14 +831,14 @@
         for (let day = 1; day <= daysInMonth; day++) {
           const dayVal = profGroup.dayTotals[day];
           bodyHTML += `
-            <td class="excel-cell text-center font-bold text-slate-800 px-1 py-1 text-[11px]">
+            <td class="excel-cell text-center font-bold text-slate-200 px-1 py-1 text-[11px]">
               ${dayVal > 0 ? dayVal : ''}
             </td>
           `;
         }
 
         bodyHTML += `
-          <td class="excel-cell text-center font-extrabold text-minsa-900 px-2 py-1 border-l-2 border-slate-400 bg-sky-100">
+          <td class="excel-cell text-center font-extrabold text-amberAccent-400 px-2 py-1 border-l-2 border-dashboard-border bg-dashboard-panel">
             ${profGroup.total.toLocaleString()}
           </td>
         </tr>
@@ -852,8 +850,8 @@
             const staffObj = profGroup.staffMap[staffKey];
 
             bodyHTML += `
-              <tr class="bg-white hover:bg-slate-50 text-slate-700 transition">
-                <td class="sticky-col-left bg-white border border-slate-300 pl-8 pr-3 py-1 font-medium truncate text-[11px] text-slate-800">
+              <tr class="bg-dashboard-panel hover:bg-dashboard-card/60 text-slate-300 transition">
+                <td class="sticky-col-left bg-dashboard-panel border border-dashboard-border pl-8 pr-3 py-1 font-medium truncate text-[11px] text-slate-300">
                   ${staffKey}
                 </td>
             `;
@@ -861,14 +859,14 @@
             for (let day = 1; day <= daysInMonth; day++) {
               const val = staffObj.days[day];
               bodyHTML += `
-                <td class="excel-cell text-center text-[11px] ${val > 0 ? 'font-semibold text-slate-900 bg-slate-50/50' : 'text-slate-300'} px-1 py-1">
+                <td class="excel-cell text-center text-[11px] ${val > 0 ? 'font-semibold text-amberAccent-400 bg-dashboard-card/30' : 'text-slate-700'} px-1 py-1">
                   ${val > 0 ? val : ''}
                 </td>
               `;
             }
 
             bodyHTML += `
-              <td class="excel-cell text-center font-bold text-slate-800 px-2 py-1 border-l-2 border-slate-300 bg-slate-100">
+              <td class="excel-cell text-center font-bold text-slate-200 px-2 py-1 border-l-2 border-dashboard-border bg-dashboard-card">
                 ${staffObj.total.toLocaleString()}
               </td>
             </tr>
@@ -880,8 +878,8 @@
       pivotBody.innerHTML = bodyHTML;
 
       let footerHTML = `
-        <tr class="bg-slate-800 text-white font-extrabold border-t-2 border-slate-900">
-          <td class="sticky-col-left bg-slate-800 border border-slate-700 px-3 py-2 text-left text-xs uppercase tracking-wider">
+        <tr class="bg-dashboard-card text-white font-extrabold border-t-2 border-dashboard-border">
+          <td class="sticky-col-left bg-dashboard-card border border-dashboard-border px-3 py-2 text-left text-xs uppercase tracking-wider text-amberAccent-400">
             Total general
           </td>
       `;
@@ -889,14 +887,14 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const daySum = dayGrandTotals[day];
         footerHTML += `
-          <td class="border border-slate-700 text-center px-1 py-2 text-xs bg-slate-800 text-sky-300">
+          <td class="border border-dashboard-border text-center px-1 py-2 text-xs text-amberAccent-400 bg-dashboard-card">
             ${daySum > 0 ? daySum : '0'}
           </td>
         `;
       }
 
       footerHTML += `
-        <td class="border border-slate-700 text-center px-2 py-2 text-sm text-yellow-300 bg-slate-900 border-l-2 border-slate-500">
+        <td class="border border-dashboard-border text-center px-2 py-2 text-sm text-slate-950 bg-amberAccent-500 font-extrabold border-l-2 border-dashboard-border">
           ${grandTotalSum.toLocaleString()}
         </td>
       </tr>
@@ -978,17 +976,17 @@
             {
               label: 'Pacientes Atendidos',
               data: dataPac,
-              backgroundColor: 'rgba(2, 132, 199, 0.7)',
-              borderColor: '#0284c7',
+              backgroundColor: '#f59e0b',
+              borderColor: '#f59e0b',
               borderWidth: 1,
               borderRadius: 3
             },
             {
               label: 'Total Atenciones',
               data: dataTot,
-              backgroundColor: 'rgba(16, 185, 129, 0.5)',
-              borderColor: '#10b981',
-              borderWidth: 1,
+              backgroundColor: 'rgba(56, 189, 248, 0.4)',
+              borderColor: '#38bdf8',
+              borderWidth: 2,
               type: 'line',
               tension: 0.3,
               fill: false
@@ -999,11 +997,11 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } }
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 }, color: '#cbd5e1' } }
           },
           scales: {
-            x: { ticks: { font: { size: 9 } } },
-            y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+            x: { ticks: { font: { size: 9 }, color: '#94a3b8' }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#233e5b' } }
           }
         }
       });
@@ -1030,15 +1028,17 @@
           datasets: [{
             data: values,
             backgroundColor: [
-              '#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'
-            ]
+              '#f59e0b', '#38bdf8', '#34d399', '#a78bfa', '#f472b6', '#fbbf24', '#2dd4bf'
+            ],
+            borderWidth: 1,
+            borderColor: '#112236'
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } }
+            legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 }, color: '#cbd5e1' } }
           }
         }
       });
@@ -1068,8 +1068,8 @@
           datasets: [{
             label: 'Total Atenciones',
             data: data,
-            backgroundColor: 'rgba(245, 158, 11, 0.8)',
-            borderColor: '#f59e0b',
+            backgroundColor: '#f59e0b',
+            borderColor: '#d97706',
             borderWidth: 1,
             borderRadius: 4
           }]
@@ -1082,8 +1082,8 @@
             legend: { display: false }
           },
           scales: {
-            x: { beginAtZero: true, ticks: { font: { size: 10 } } },
-            y: { ticks: { font: { size: 9 } } }
+            x: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#233e5b' } },
+            y: { ticks: { font: { size: 9 }, color: '#cbd5e1' }, grid: { display: false } }
           }
         }
       });
@@ -1117,12 +1117,12 @@
             {
               label: 'Pacientes Atendidos',
               data: dataPac,
-              backgroundColor: '#3b82f6'
+              backgroundColor: '#f59e0b'
             },
             {
               label: 'Total Atenciones',
               data: dataTot,
-              backgroundColor: '#10b981'
+              backgroundColor: '#38bdf8'
             }
           ]
         },
@@ -1130,11 +1130,11 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+            legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 }, color: '#cbd5e1' } }
           },
           scales: {
-            x: { ticks: { font: { size: 10 } } },
-            y: { beginAtZero: true }
+            x: { ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#233e5b' } }
           }
         }
       });
