@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PRODUCCIÓN DEL PERSONAL DE SALUD - MICRORED COLCABAMBA</title>
+  <title>PRODUCIÓN DEL PERSONAL DE SALUD - MICRORED COLCABAMBA</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -119,8 +119,8 @@
         <button id="btnExportExcel" onclick="exportPivotTableToExcel()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
           <i class="fa-solid fa-file-excel text-sm"></i> Exportar Matriz a Excel
         </button>
-        <button onclick="resetDataToDemo()" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg shadow transition" title="Restaurar datos de muestra">
-          <i class="fa-solid fa-rotate-left"></i> Demo
+        <button onclick="loadInitialDemoData()" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg shadow transition" title="Recargar datos del repositorio">
+          <i class="fa-solid fa-rotate-left"></i> Recargar
         </button>
       </div>
     </div>
@@ -143,11 +143,11 @@
             <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelect(event)">
             <i class="fa-solid fa-cloud-arrow-up text-2xl text-minsa-500 mb-1"></i>
             <p class="text-xs text-slate-600 font-medium">Arrastra tu <span class="font-semibold text-minsa-700">PRODUCCION_SQL_DIA.xlsx</span></p>
-            <p class="text-[10px] text-slate-400 mt-0.5">o haz clic para examinar</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">o haz clic para examinar manual</p>
           </div>
         </div>
         <div id="fileStatus" class="mt-2 text-[11px] text-slate-500 truncate flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Datos activos: <span id="fileNameDisplay" class="font-medium text-slate-700">Datos Demo Colcabamba</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Datos activos: <span id="fileNameDisplay" class="font-medium text-slate-700">Cargando Excel automático...</span>
         </div>
       </div>
 
@@ -283,7 +283,7 @@
         <div class="flex items-center space-x-2 text-xs">
           <span class="text-slate-600">Establecimiento:</span>
           <span id="currentEessBadge" class="bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded border border-sky-300">
-            CENTRO DE SALUD COLCABAMBA
+            MICRORED COLCABAMBA
           </span>
           <button onclick="toggleExpandAllGroups()" id="btnToggleExpand" class="ml-2 px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded text-[11px] font-semibold text-slate-700 shadow-sm transition">
             <i class="fa-solid fa-folder-minus mr-1"></i> Plegar/Desplegar Todo
@@ -295,11 +295,9 @@
       <div class="overflow-x-auto pivot-scroll max-h-[600px] overflow-y-auto relative">
         <table id="pivotMatrixTable" class="w-full border-collapse text-xs select-none">
           <thead>
-            <!-- Row 1: Header Day Columns Generated Dynamically -->
             <tr id="pivotHeaderRow" class="bg-excelHeader text-slate-800 font-bold">
               <!-- Dynamically rendered -->
             </tr>
-            <!-- Row 2: Category Totals Banner / Column Indicators -->
             <tr id="pivotSubheaderRow" class="bg-excelSubheader font-bold text-slate-900 border-b-2 border-slate-400">
               <!-- Dynamically rendered -->
             </tr>
@@ -430,7 +428,7 @@
     ];
 
     // ==========================================
-    // INITIALIZATION & DEMO DATASET
+    // AUTOMATIC INITIALIZATION (PRODUCCION_SQL_DIA.xlsx)
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       setupDropZone();
@@ -438,188 +436,90 @@
     });
 
     function loadInitialDemoData() {
-      const eess = "CENTRO DE SALUD COLCABAMBA";
-      const year = 2026;
-      const month = "Ago";
+      document.getElementById('fileNameDisplay').textContent = "Cargando PRODUCCION_SQL_DIA.xlsx...";
 
-      const demoDataset = [
-        // ENFERMERA (O)
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 3, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 4, pac: 5, tot: 6 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 5, pac: 5, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 7, pac: 2, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 11, pac: 4, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 12, pac: 10, tot: 12 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 13, pac: 10, tot: 11 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 14, pac: 7, tot: 8 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 15, pac: 11, tot: 14 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 16, pac: 2, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 18, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 21, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 22, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 23, pac: 6, tot: 8 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 24, pac: 3, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 28, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BEALIAS PEREZ HUAMAN", day: 31, pac: 1, tot: 1 },
+      // Fetch automatic excel file from GitHub repo
+      fetch('./PRODUCCION_SQL_DIA.xlsx')
+        .then(response => {
+          if (!response.ok) throw new Error("No se encontró el archivo PRODUCCION_SQL_DIA.xlsx");
+          return response.arrayBuffer();
+        })
+        .then(data => {
+          const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 3, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 7, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 8, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 9, pac: 8, tot: 9 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 10, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 11, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 14, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 15, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 16, pac: 4, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 17, pac: 13, tot: 15 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 18, pac: 10, tot: 12 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 19, pac: 4, tot: 4 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 20, pac: 11, tot: 13 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 21, pac: 3, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 22, pac: 10, tot: 11 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 24, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 25, pac: 4, tot: 4 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "BRITA SOLEDAD MASCO CCAMA", day: 27, pac: 22, tot: 25 },
-
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 4, pac: 10, tot: 11 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 5, pac: 5, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 6, pac: 6, tot: 7 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 10, pac: 10, tot: 12 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 11, pac: 7, tot: 8 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 12, pac: 12, tot: 14 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 16, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 17, pac: 3, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 18, pac: 14, tot: 16 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 19, pac: 10, tot: 11 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 20, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 21, pac: 15, tot: 18 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 22, pac: 5, tot: 6 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 24, pac: 5, tot: 6 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "DINESSE GUERRA FLORES", day: 25, pac: 1, tot: 1 },
-
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 1, pac: 7, tot: 8 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 2, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 3, pac: 5, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 4, pac: 5, tot: 6 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 5, pac: 6, tot: 7 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 6, pac: 4, tot: 5 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 7, pac: 2, tot: 2 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 13, pac: 4, tot: 4 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 14, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 15, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 16, pac: 6, tot: 7 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 17, pac: 9, tot: 10 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 18, pac: 9, tot: 10 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 20, pac: 10, tot: 12 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 22, pac: 4, tot: 4 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 23, pac: 5, tot: 6 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 24, pac: 3, tot: 3 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 27, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ESMERALDA JAIME OSCCO", day: 30, pac: 6, tot: 7 },
-
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 11, pac: 16, tot: 18 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 12, pac: 13, tot: 15 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 13, pac: 8, tot: 9 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 15, pac: 13, tot: 15 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 16, pac: 21, tot: 23 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 17, pac: 23, tot: 26 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 18, pac: 16, tot: 18 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 19, pac: 10, tot: 12 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 24, pac: 11, tot: 13 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 25, pac: 18, tot: 20 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 26, pac: 21, tot: 24 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 27, pac: 11, tot: 13 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 28, pac: 1, tot: 1 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 29, pac: 26, tot: 30 },
-        { eess, year, month, profession: "ENFERMERA (O)", staff: "ROCIO DUEDAS FLORES", day: 31, pac: 14, tot: 16 },
-
-        // MEDICO GENERAL
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 9, pac: 18, tot: 20 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 10, pac: 8, tot: 9 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 11, pac: 60, tot: 68 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 13, pac: 11, tot: 12 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 14, pac: 17, tot: 19 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 15, pac: 16, tot: 18 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 16, pac: 3, tot: 3 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "CLAUDIA ANAIS SUCLUPE VILLAFANE", day: 17, pac: 19, tot: 22 },
-
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 10, pac: 8, tot: 9 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 11, pac: 18, tot: 20 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 12, pac: 8, tot: 9 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 13, pac: 4, tot: 4 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 14, pac: 5, tot: 6 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 15, pac: 7, tot: 8 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 16, pac: 8, tot: 9 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 17, pac: 28, tot: 31 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "IVAN GONZALO HERNANDEZ GOZAR", day: 18, pac: 7, tot: 8 },
-
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 1, pac: 2, tot: 2 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 2, pac: 11, tot: 12 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 3, pac: 12, tot: 14 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 6, pac: 17, tot: 19 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 7, pac: 2, tot: 2 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 9, pac: 23, tot: 26 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 11, pac: 1, tot: 1 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 19, pac: 28, tot: 31 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 20, pac: 54, tot: 60 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 21, pac: 12, tot: 13 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 22, pac: 24, tot: 27 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 24, pac: 10, tot: 11 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "JENNIFER MELISSA MONTES LUCAS", day: 30, pac: 4, tot: 4 },
-
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 5, pac: 10, tot: 11 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 6, pac: 9, tot: 10 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 8, pac: 2, tot: 2 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 10, pac: 11, tot: 12 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 11, pac: 19, tot: 22 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 12, pac: 8, tot: 9 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 16, pac: 2, tot: 2 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 18, pac: 16, tot: 18 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 19, pac: 34, tot: 38 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 20, pac: 28, tot: 31 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 21, pac: 15, tot: 17 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 22, pac: 18, tot: 20 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 23, pac: 25, tot: 28 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 25, pac: 12, tot: 13 },
-        { eess, year, month, profession: "MEDICO GENERAL", staff: "KATY LIZ QUIÑONES DE LA CRUZ", day: 30, pac: 7, tot: 8 },
-
-        // OBSTETRA
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 1, pac: 10, tot: 12 },
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 2, pac: 15, tot: 18 },
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 5, pac: 12, tot: 14 },
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 12, pac: 18, tot: 20 },
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 19, pac: 22, tot: 25 },
-        { eess, year, month, profession: "OBSTETRA", staff: "YESSENIA MEDINA CARBAJAL", day: 26, pac: 14, tot: 16 }
-      ];
-
-      // Add a second demo EESS for dropdown comparison
-      const secondEess = "PUESTO DE SALUD SURCUBAMBA";
-      for (let i = 1; i <= 20; i++) {
-        demoDataset.push({
-          eess: secondEess,
-          year: 2026,
-          month: "Ago",
-          profession: i % 2 === 0 ? "MEDICO GENERAL" : "ODONTOLOGO",
-          staff: "PROFESIONAL SURCUBAMBA " + i,
-          day: (i % 28) + 1,
-          pac: Math.floor(Math.random() * 15) + 5,
-          tot: Math.floor(Math.random() * 20) + 6
+          processParsedRows(jsonRows);
+          document.getElementById('fileNameDisplay').textContent = "PRODUCCION_SQL_DIA.xlsx (Automático)";
+        })
+        .catch(err => {
+          console.warn("No se pudo cargar de forma automática, esperando carga manual:", err);
+          document.getElementById('fileNameDisplay').textContent = "Selecciona o arrastra un Excel";
         });
-      }
+    }
 
-      rawHealthData = demoDataset;
+    function processParsedRows(jsonRows) {
+      const parsedData = [];
+      
+      jsonRows.forEach(row => {
+        const eessVal = row["ESTABLECIMIENTO"] || row["EESS"] || row["Nombre_Eess"] || "ESTABLECIMIENTO UNICO";
+        const profVal = row["PROFESION"] || row["DESCRIPCION_PROFESION"] || row["Especialidad"] || "OTRO PERSONAL";
+        const staffVal = row["PERSONAL_SALUD"] || row["NOMBRES_PERSONAL"] || row["PROFESIONAL"] || "DESCONOCIDO";
+        
+        let dateVal = row["FECHA_ATENCION"] || row["FECHA"] || row["Fecha"] || "2026-08-01";
+        let dayNum = 1;
+        let monthStr = "Ago";
+        let yearNum = 2026;
+
+        if (typeof dateVal === 'string') {
+          const parts = dateVal.split(/[-/]/);
+          if (parts.length >= 3) {
+            if (parts[0].length === 4) {
+              yearNum = parseInt(parts[0]) || 2026;
+              const mIdx = parseInt(parts[1]) - 1;
+              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
+              dayNum = parseInt(parts[2]) || 1;
+            } else {
+              dayNum = parseInt(parts[0]) || 1;
+              const mIdx = parseInt(parts[1]) - 1;
+              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
+              yearNum = parseInt(parts[2]) || 2026;
+            }
+          }
+        } else if (typeof dateVal === 'number') {
+          const jsDate = new Date((dateVal - (25567 + 2)) * 86400 * 1000);
+          dayNum = jsDate.getDate() || 1;
+          monthStr = MONTH_NAMES[jsDate.getMonth()] ? MONTH_NAMES[jsDate.getMonth()].id : "Ago";
+          yearNum = jsDate.getFullYear() || 2026;
+        }
+
+        if (row["DIA"] || row["Dia"]) {
+          dayNum = parseInt(row["DIA"] || row["Dia"]) || dayNum;
+        }
+
+        const pacVal = parseInt(row["PACIENTES_ATENDIDOS_DIA"] || row["PACIENTES"] || row["Atendidos"]) || 1;
+        const totVal = parseInt(row["TOTAL_ATENCIONES_DIA"] || row["Atenciones"]) || pacVal;
+
+        parsedData.push({
+          eess: String(eessVal).toUpperCase().trim(),
+          profession: String(profVal).toUpperCase().trim(),
+          staff: String(staffVal).toUpperCase().trim(),
+          year: yearNum,
+          month: monthStr,
+          day: dayNum,
+          pac: pacVal,
+          tot: totVal
+        });
+      });
+
+      rawHealthData = parsedData;
       populateFilterDropdowns();
       applyFiltersAndRender();
     }
 
-    function resetDataToDemo() {
-      document.getElementById('fileNameDisplay').textContent = "Datos Demo Colcabamba";
-      document.getElementById('excelFileInput').value = "";
-      loadInitialDemoData();
-    }
-
     // ==========================================
-    // EXCEL FILE READER (SheetJS)
+    // EXCEL FILE READER (MANUAL OVERRIDE)
     // ==========================================
     function setupDropZone() {
       const dropZone = document.getElementById('dropZone');
@@ -671,62 +571,7 @@
             return;
           }
 
-          const parsedData = [];
-          
-          jsonRows.forEach(row => {
-            const eessVal = row["ESTABLECIMIENTO"] || row["EESS"] || row["Nombre_Eess"] || "ESTABLECIMIENTO UNICO";
-            const profVal = row["PROFESION"] || row["DESCRIPCION_PROFESION"] || row["Especialidad"] || "OTRO PERSONAL";
-            const staffVal = row["PERSONAL_SALUD"] || row["NOMBRES_PERSONAL"] || row["PROFESIONAL"] || "DESCONOCIDO";
-            
-            let dateVal = row["FECHA_ATENCION"] || row["FECHA"] || row["Fecha"] || "2026-08-01";
-            let dayNum = 1;
-            let monthStr = "Ago";
-            let yearNum = 2026;
-
-            if (typeof dateVal === 'string') {
-              const parts = dateVal.split(/[-/]/);
-              if (parts.length >= 3) {
-                if (parts[0].length === 4) {
-                  yearNum = parseInt(parts[0]) || 2026;
-                  const mIdx = parseInt(parts[1]) - 1;
-                  monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
-                  dayNum = parseInt(parts[2]) || 1;
-                } else {
-                  dayNum = parseInt(parts[0]) || 1;
-                  const mIdx = parseInt(parts[1]) - 1;
-                  monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
-                  yearNum = parseInt(parts[2]) || 2026;
-                }
-              }
-            } else if (typeof dateVal === 'number') {
-              const jsDate = new Date((dateVal - (25567 + 2)) * 86400 * 1000);
-              dayNum = jsDate.getDate() || 1;
-              monthStr = MONTH_NAMES[jsDate.getMonth()] ? MONTH_NAMES[jsDate.getMonth()].id : "Ago";
-              yearNum = jsDate.getFullYear() || 2026;
-            }
-
-            if (row["DIA"] || row["Dia"]) {
-              dayNum = parseInt(row["DIA"] || row["Dia"]) || dayNum;
-            }
-
-            const pacVal = parseInt(row["PACIENTES_ATENDIDOS_DIA"] || row["PACIENTES"] || row["Atendidos"]) || 1;
-            const totVal = parseInt(row["TOTAL_ATENCIONES_DIA"] || row["ATENCIONES font-bold"] || row["Atenciones"]) || pacVal;
-
-            parsedData.push({
-              eess: String(eessVal).toUpperCase().trim(),
-              profession: String(profVal).toUpperCase().trim(),
-              staff: String(staffVal).toUpperCase().trim(),
-              year: yearNum,
-              month: monthStr,
-              day: dayNum,
-              pac: pacVal,
-              tot: totVal
-            });
-          });
-
-          rawHealthData = parsedData;
-          populateFilterDropdowns();
-          applyFiltersAndRender();
+          processParsedRows(jsonRows);
 
         } catch (err) {
           console.error(err);
@@ -751,21 +596,18 @@
         if (item.year) yearSet.add(item.year);
       });
 
-      // EESS Select
       const filterEess = document.getElementById('filterEess');
       filterEess.innerHTML = `<option value="ALL">-- TODOS LOS ESTABLECIMIENTOS --</option>`;
       Array.from(eessSet).sort().forEach(e => {
         filterEess.innerHTML += `<option value="${e}">${e}</option>`;
       });
 
-      // Profession Select
       const filterProfession = document.getElementById('filterProfession');
       filterProfession.innerHTML = `<option value="ALL">-- TODAS LAS PROFESIONES --</option>`;
       Array.from(profSet).sort().forEach(p => {
         filterProfession.innerHTML += `<option value="${p}">${p}</option>`;
       });
 
-      // Year Select
       const filterYear = document.getElementById('filterYear');
       filterYear.innerHTML = "";
       Array.from(yearSet).sort().reverse().forEach(y => {
