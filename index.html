@@ -401,7 +401,7 @@
     let selectedEess = "ALL";
     let selectedProfession = "ALL";
     let selectedYear = "2026";
-    let selectedMonth = "Ago"; // Default Month
+    let selectedMonth = ""; // Se auto-detectará según los datos del Excel
     let searchQuery = "";
     
     // Grouping collapse state for Profession headers
@@ -411,21 +411,30 @@
     // Charts instances
     let chartDaily, chartPie, chartTop, chartCompare;
 
-    // Month mappings
+    // Month mappings (Soporta múltiples formatos de texto)
     const MONTH_NAMES = [
-      { id: "Ene", num: 1, label: "ENE" },
-      { id: "Feb", num: 2, label: "FEB" },
-      { id: "Mar", num: 3, label: "MAR" },
-      { id: "Abr", num: 4, label: "ABR" },
-      { id: "May", num: 5, label: "MAY" },
-      { id: "Jun", num: 6, label: "JUN" },
-      { id: "Jul", num: 7, label: "JUL" },
-      { id: "Ago", num: 8, label: "AGO" },
-      { id: "Set", num: 9, label: "SET" },
-      { id: "Oct", num: 10, label: "OCT" },
-      { id: "Nov", num: 11, label: "NOV" },
-      { id: "Dic", num: 12, label: "DIC" }
+      { id: "Ene", num: 1, label: "ENE", aliases: ["ENE", "ENERO", "JAN", "JANUARY", "1", "01"] },
+      { id: "Feb", num: 2, label: "FEB", aliases: ["FEB", "FEBRERO", "FEBRUARY", "2", "02"] },
+      { id: "Mar", num: 3, label: "MAR", aliases: ["MAR", "MARZO", "MARCH", "3", "03"] },
+      { id: "Abr", num: 4, label: "ABR", aliases: ["ABR", "ABRIL", "APR", "APRIL", "4", "04"] },
+      { id: "May", num: 5, label: "MAY", aliases: ["MAY", "MAYO", "5", "05"] },
+      { id: "Jun", num: 6, label: "JUN", aliases: ["JUN", "JUNIO", "JUNE", "6", "06"] },
+      { id: "Jul", num: 7, label: "JUL", aliases: ["JUL", "JULIO", "JULY", "7", "07"] },
+      { id: "Ago", num: 8, label: "AGO", aliases: ["AGO", "AGOSTO", "AUG", "AUGUST", "8", "08"] },
+      { id: "Set", num: 9, label: "SET", aliases: ["SET", "SEP", "SETIEMBRE", "SEPTIEMBRE", "SEPTEMBER", "9", "09"] },
+      { id: "Oct", num: 10, label: "OCT", aliases: ["OCT", "OCTUBRE", "OCTOBER", "10"] },
+      { id: "Nov", num: 11, label: "NOV", aliases: ["NOV", "NOVIEMBRE", "NOVEMBER", "11"] },
+      { id: "Dic", num: 12, label: "DIC", aliases: ["DIC", "DICIEMBRE", "DEC", "DECEMBER", "12"] }
     ];
+
+    function parseMonthString(val) {
+      if (!val) return "Ene";
+      const str = String(val).toUpperCase().trim();
+      for (const m of MONTH_NAMES) {
+        if (m.aliases.includes(str)) return m.id;
+      }
+      return "Ene";
+    }
 
     // ==========================================
     // AUTOMATIC INITIALIZATION (PRODUCCION_SQL_DIA.xlsx)
@@ -438,7 +447,6 @@
     function loadInitialDemoData() {
       document.getElementById('fileNameDisplay').textContent = "Cargando PRODUCCION_SQL_DIA.xlsx...";
 
-      // Fetch automatic excel file from GitHub repo
       fetch('./PRODUCCION_SQL_DIA.xlsx')
         .then(response => {
           if (!response.ok) throw new Error("No se encontró el archivo PRODUCCION_SQL_DIA.xlsx");
@@ -463,14 +471,18 @@
       const parsedData = [];
       
       jsonRows.forEach(row => {
-        const eessVal = row["ESTABLECIMIENTO"] || row["EESS"] || row["Nombre_Eess"] || "ESTABLECIMIENTO UNICO";
+        const eessVal = row["ESTABLECIMIENTO"] || row["EESS"] || row["Nombre_Eess"] || row["NOM_EESS"] || "ESTABLECIMIENTO UNICO";
         const profVal = row["PROFESION"] || row["DESCRIPCION_PROFESION"] || row["Especialidad"] || "OTRO PERSONAL";
         const staffVal = row["PERSONAL_SALUD"] || row["NOMBRES_PERSONAL"] || row["PROFESIONAL"] || "DESCONOCIDO";
         
-        let dateVal = row["FECHA_ATENCION"] || row["FECHA"] || row["Fecha"] || "2026-08-01";
+        let dateVal = row["FECHA_ATENCION"] || row["FECHA"] || row["Fecha"] || row["MES"] || "2026-01-01";
         let dayNum = 1;
-        let monthStr = "Ago";
+        let monthStr = "Ene";
         let yearNum = 2026;
+
+        if (row["MES"] || row["Mes"]) {
+          monthStr = parseMonthString(row["MES"] || row["Mes"]);
+        }
 
         if (typeof dateVal === 'string') {
           const parts = dateVal.split(/[-/]/);
@@ -478,20 +490,26 @@
             if (parts[0].length === 4) {
               yearNum = parseInt(parts[0]) || 2026;
               const mIdx = parseInt(parts[1]) - 1;
-              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
+              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : monthStr;
               dayNum = parseInt(parts[2]) || 1;
             } else {
               dayNum = parseInt(parts[0]) || 1;
               const mIdx = parseInt(parts[1]) - 1;
-              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : "Ago";
+              monthStr = MONTH_NAMES[mIdx] ? MONTH_NAMES[mIdx].id : monthStr;
               yearNum = parseInt(parts[2]) || 2026;
             }
+          } else if (parts.length === 1 && isNaN(parts[0])) {
+            monthStr = parseMonthString(parts[0]);
           }
         } else if (typeof dateVal === 'number') {
           const jsDate = new Date((dateVal - (25567 + 2)) * 86400 * 1000);
           dayNum = jsDate.getDate() || 1;
-          monthStr = MONTH_NAMES[jsDate.getMonth()] ? MONTH_NAMES[jsDate.getMonth()].id : "Ago";
+          monthStr = MONTH_NAMES[jsDate.getMonth()] ? MONTH_NAMES[jsDate.getMonth()].id : monthStr;
           yearNum = jsDate.getFullYear() || 2026;
+        }
+
+        if (row["ANO"] || row["AÑO"] || row["Anio"]) {
+          yearNum = parseInt(row["ANO"] || row["AÑO"] || row["Anio"]) || yearNum;
         }
 
         if (row["DIA"] || row["Dia"]) {
@@ -514,6 +532,13 @@
       });
 
       rawHealthData = parsedData;
+
+      // Auto-seleccionar el primer mes con registros si el actual está vacío
+      const detectedMonths = Array.from(new Set(rawHealthData.map(d => d.month)));
+      if (detectedMonths.length > 0 && !detectedMonths.includes(selectedMonth)) {
+        selectedMonth = detectedMonths[0];
+      }
+
       populateFilterDropdowns();
       applyFiltersAndRender();
     }
@@ -624,15 +649,25 @@
       const container = document.getElementById('monthSelectorContainer');
       container.innerHTML = "";
 
+      // Obtener meses que realmente tienen datos
+      const activeMonthsInDataset = new Set(rawHealthData.map(d => d.month));
+
       MONTH_NAMES.forEach(m => {
         const isActive = (m.id === selectedMonth);
-        const btnClass = isActive 
-          ? "bg-minsa-700 text-white font-bold shadow-sm" 
-          : "bg-white text-slate-600 hover:bg-slate-200 font-medium border border-slate-300";
+        const hasData = activeMonthsInDataset.has(m.id);
+
+        let btnClass = "";
+        if (isActive) {
+          btnClass = "bg-minsa-700 text-white font-bold shadow-sm ring-2 ring-sky-300";
+        } else if (hasData) {
+          btnClass = "bg-white text-slate-800 hover:bg-slate-200 font-bold border border-slate-300";
+        } else {
+          btnClass = "bg-slate-100 text-slate-400 font-normal border border-slate-200 opacity-60";
+        }
         
         const btn = document.createElement('button');
         btn.className = `px-2.5 py-1 rounded text-xs transition uppercase ${btnClass}`;
-        btn.textContent = m.label;
+        btn.innerHTML = `${m.label} ${hasData ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-0.5"></span>' : ''}`;
         btn.onclick = () => {
           selectedMonth = m.id;
           renderMonthTimeline();
@@ -770,7 +805,7 @@
           <tr>
             <td colspan="${daysInMonth + 2}" class="p-8 text-center text-slate-400 font-medium">
               <i class="fa-solid fa-folder-open text-2xl mb-2 block text-slate-300"></i>
-              No hay datos disponibles para los filtros seleccionados.
+              No hay datos disponibles para el mes seleccionado (${selectedMonth}).
             </td>
           </tr>
         `;
@@ -886,7 +921,7 @@
 
     function getDaysInMonth(monthStr, yearNum) {
       const mObj = MONTH_NAMES.find(m => m.id === monthStr);
-      const monthIdx = mObj ? mObj.num : 8;
+      const monthIdx = mObj ? mObj.num : 1;
       return new Date(yearNum, monthIdx, 0).getDate();
     }
 
